@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { 
   Home, 
-  Timeline, 
+  Clock, 
   Map, 
   BookOpen, 
   Zap,
@@ -24,7 +24,7 @@ import {
 
 const navigationItems = [
   { title: 'Home', url: '/', icon: Home },
-  { title: 'Cosmic Timeline', url: '/timeline', icon: Timeline },
+  { title: 'Cosmic Timeline', url: '/timeline', icon: Clock },
   { title: 'Star Map Explorer', url: '/starmap', icon: Map },
   { title: 'Cosmic Storybook', url: '/storybook', icon: BookOpen },
   { title: 'Event Simulator', url: '/simulator', icon: Zap },
