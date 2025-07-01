@@ -12,7 +12,7 @@ const CosmicHero = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-0">
         <div className="absolute top-20 left-10 w-4 h-4 bg-purple-400 rounded-full animate-twinkle" />
         <div className="absolute top-40 right-20 w-2 h-2 bg-blue-300 rounded-full animate-twinkle" style={{ animationDelay: '1s' }} />
         <div className="absolute bottom-60 left-1/4 w-3 h-3 bg-pink-300 rounded-full animate-twinkle" style={{ animationDelay: '2s' }} />
@@ -24,23 +24,23 @@ const CosmicHero = () => {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
+      <div className="relative z-20 text-center px-4 max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 glow-text">
-            <span className="cosmic-gradient bg-clip-text text-transparent animate-cosmic-pulse">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 relative z-20">
+            <span className="cosmic-gradient bg-clip-text text-transparent">
               Cosmic Chronicles
             </span>
           </h1>
-          <p className="text-2xl md:text-3xl text-purple-200 mb-4 animate-fade-in">
+          <p className="text-2xl md:text-3xl text-purple-200 mb-4 animate-fade-in relative z-20">
             On This Day in Space
           </p>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-in">
+          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-in relative z-20">
             Journey through the universe's most incredible moments. Discover astronomical events, 
             space missions, and cosmic phenomena that shaped our understanding of the cosmos.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 relative z-20">
           <Button 
             onClick={scrollToTimeline}
             className="px-8 py-4 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 animate-glow transition-all duration-300 transform hover:scale-105"
@@ -56,13 +56,13 @@ const CosmicHero = () => {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
           <ArrowDown className="w-8 h-8 text-purple-400" />
         </div>
       </div>
 
       {/* Cosmic particles */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none z-5">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}

@@ -83,19 +83,19 @@ const GalacticTimeline = () => {
   return (
     <section id="galactic-timeline" className="py-20 px-4 relative">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold mb-6 glow-text">
+        <div className="text-center mb-16 relative z-20">
+          <h2 className="text-5xl font-bold mb-6 relative z-20">
             <span className="cosmic-gradient bg-clip-text text-transparent">
               Galactic Timeline
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto relative z-20">
             Journey through the most significant moments in space exploration and cosmic discovery
           </p>
         </div>
 
         {/* Filter buttons */}
-        <div className="flex flex-wrap gap-4 justify-center mb-12">
+        <div className="flex flex-wrap gap-4 justify-center mb-12 relative z-20">
           {['all', 'mission', 'discovery', 'achievement', 'phenomenon'].map((category) => (
             <Button
               key={category}
@@ -113,9 +113,9 @@ const GalacticTimeline = () => {
         </div>
 
         {/* Timeline */}
-        <div className="relative">
+        <div className="relative z-10">
           {/* Timeline line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full opacity-50" />
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full opacity-50 z-0" />
 
           <div className="space-y-12">
             {filteredEvents.map((event, index) => (
@@ -123,10 +123,10 @@ const GalacticTimeline = () => {
                 key={event.id}
                 className={`flex items-center ${
                   index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                } gap-8`}
+                } gap-8 relative z-10`}
               >
                 {/* Timeline node */}
-                <div className="relative flex-shrink-0">
+                <div className="relative flex-shrink-0 z-10">
                   <div className={`w-6 h-6 rounded-full ${getCategoryColor(event.category)} animate-glow relative z-10`} />
                   <div className="absolute inset-0 w-6 h-6 rounded-full bg-white opacity-20 animate-ping" />
                 </div>
@@ -135,7 +135,7 @@ const GalacticTimeline = () => {
                 <Card 
                   className={`flex-1 max-w-md glass-morphism hover:bg-white/10 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
                     index % 2 === 0 ? 'ml-4' : 'mr-4'
-                  }`}
+                  } relative z-10`}
                   onClick={() => setSelectedEvent(event)}
                 >
                   <CardHeader>
@@ -163,8 +163,8 @@ const GalacticTimeline = () => {
       </div>
 
       {/* Floating cosmic elements */}
-      <div className="absolute top-20 left-10 w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 opacity-30 animate-float" />
-      <div className="absolute bottom-20 right-10 w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 opacity-40 animate-float" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-20 left-10 w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 opacity-30 animate-float z-0" />
+      <div className="absolute bottom-20 right-10 w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 opacity-40 animate-float z-0" style={{ animationDelay: '2s' }} />
     </section>
   );
 };
