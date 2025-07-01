@@ -14,7 +14,9 @@ const Index = () => {
       
       <div className="relative z-10">
         <CosmicHero />
-        <GalacticTimeline />
+        <div id="galactic-timeline">
+          <GalacticTimeline />
+        </div>
         <StarMapExplorer />
         <CosmicStorybook />
         <EventSimulator />
