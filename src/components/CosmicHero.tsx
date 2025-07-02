@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown } from 'lucide-react';
 
 const CosmicHero = () => {
-  const scrollToTimeline = () => {
-    const timeline = document.getElementById('galactic-timeline');
-    timeline?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToEvents = () => {
+    const eventsSection = document.getElementById('on-this-day-section');
+    eventsSection?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -40,14 +40,15 @@ const CosmicHero = () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 relative z-20">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 relative z-20">
           <Button 
-            onClick={scrollToTimeline}
+            onClick={() => window.location.href = '/timeline'}
             className="px-8 py-4 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 animate-glow transition-all duration-300 transform hover:scale-105"
           >
             Explore the Timeline
           </Button>
           <Button 
+            onClick={scrollToEvents}
             variant="outline" 
             className="px-8 py-4 text-lg border-purple-500 text-purple-300 hover:bg-purple-500/10 transition-all duration-300"
           >
@@ -55,8 +56,8 @@ const CosmicHero = () => {
           </Button>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
+        {/* Scroll indicator - moved down */}
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
           <ArrowDown className="w-8 h-8 text-purple-400" />
         </div>
       </div>

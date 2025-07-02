@@ -2,10 +2,7 @@
 import React from 'react';
 import StarField from '@/components/StarField';
 import CosmicHero from '@/components/CosmicHero';
-import GalacticTimeline from '@/components/GalacticTimeline';
-import StarMapExplorer from '@/components/StarMapExplorer';
-import CosmicStorybook from '@/components/CosmicStorybook';
-import EventSimulator from '@/components/EventSimulator';
+import OnThisDaySection from '@/components/OnThisDaySection';
 
 const Index = () => {
   return (
@@ -14,12 +11,7 @@ const Index = () => {
       
       <div className="relative z-10">
         <CosmicHero />
-        <div id="galactic-timeline">
-          <GalacticTimeline />
-        </div>
-        <StarMapExplorer />
-        <CosmicStorybook />
-        <EventSimulator />
+        <OnThisDaySection />
         
         {/* Footer */}
         <footer className="py-12 px-4 border-t border-purple-500/20">
