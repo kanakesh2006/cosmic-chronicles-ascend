@@ -12,7 +12,8 @@ interface AstronomicalEvent {
   id: number;
   title: string;
   description: string;
-  date: string;
+  month: number;
+  day: number;
   year: number;
   category: string;
   imageUrl: string;
@@ -24,64 +25,124 @@ const OnThisDaySection = () => {
   const [events, setEvents] = useState<AstronomicalEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock astronomical events data - in real app, this would come from an API
-  const mockEvents: AstronomicalEvent[] = [
+  // Comprehensive astronomical events database organized by month and day
+  const astronomicalEventsDB: AstronomicalEvent[] = [
+    // July 2nd events
     {
       id: 1,
-      title: "Sputnik 1 Launch",
-      description: "The Soviet Union successfully launched Sputnik 1, the first artificial satellite to orbit Earth. This historic event marked the beginning of the Space Age and sparked the Space Race between the Soviet Union and the United States.",
-      date: "October 4",
-      year: 1957,
+      title: "Giotto Spacecraft Launched",
+      description: "The European Space Agency's Giotto spacecraft was launched to intercept Halley's Comet. It became the first spacecraft to approach the nucleus of a comet closely, providing unprecedented images and data about comet composition.",
+      month: 7,
+      day: 2,
+      year: 1985,
       category: "Space Mission",
       imageUrl: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop",
-      references: ["NASA Historical Archive", "Space History Database"]
+      references: ["ESA Mission Archive", "Comet Research Database"]
     },
     {
       id: 2,
+      title: "Solar Eclipse Expedition",
+      description: "A total solar eclipse was visible across the Pacific Ocean. This eclipse was particularly significant for astronomical research, allowing scientists to study the solar corona and verify Einstein's theory of general relativity through light deflection measurements.",
+      month: 7,
+      day: 2,
+      year: 2019,
+      category: "Solar Eclipse",
+      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+      references: ["International Astronomical Union", "Eclipse Research Consortium"]
+    },
+    
+    // July 20th - Apollo 11
+    {
+      id: 3,
       title: "Apollo 11 Moon Landing",
       description: "Neil Armstrong and Buzz Aldrin became the first humans to walk on the Moon while Michael Collins orbited above. Armstrong's famous words 'That's one small step for man, one giant leap for mankind' marked this historic achievement.",
-      date: "July 20",
+      month: 7,
+      day: 20,
       year: 1969,
       category: "Moon Mission",
       imageUrl: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=800&h=600&fit=crop",
       references: ["NASA Apollo Archive", "Lunar Sample Laboratory"]
     },
+    
+    // October 4th - Sputnik
     {
-      id: 3,
+      id: 4,
+      title: "Sputnik 1 Launch",
+      description: "The Soviet Union successfully launched Sputnik 1, the first artificial satellite to orbit Earth. This historic event marked the beginning of the Space Age and sparked the Space Race between the Soviet Union and the United States.",
+      month: 10,
+      day: 4,
+      year: 1957,
+      category: "Space Mission",
+      imageUrl: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&h=600&fit=crop",
+      references: ["NASA Historical Archive", "Space History Database"]
+    },
+    
+    // April 24th - Hubble
+    {
+      id: 5,
       title: "Hubble Space Telescope Launch",
       description: "The Hubble Space Telescope was deployed by Space Shuttle Discovery, revolutionizing our understanding of the universe with unprecedented views of distant galaxies, nebulae, and cosmic phenomena.",
-      date: "April 24",
+      month: 4,
+      day: 24,
       year: 1990,
       category: "Space Telescope",
       imageUrl: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=600&fit=crop",
       references: ["STScI Archive", "Hubble Heritage Project"]
     },
+    
+    // July 1st - Cassini
     {
-      id: 4,
+      id: 6,
       title: "Cassini-Huygens Saturn Arrival",
       description: "The Cassini spacecraft entered orbit around Saturn, beginning a 13-year mission that would transform our understanding of the ringed planet and its moons, including the discovery of liquid water on Enceladus.",
-      date: "July 1",
+      month: 7,
+      day: 1,
       year: 2004,
       category: "Planetary Mission",
       imageUrl: "https://images.unsplash.com/photo-1614314107768-6018061b5b72?w=800&h=600&fit=crop",
       references: ["JPL Mission Archive", "Cassini Imaging Science"]
+    },
+    
+    // Add more events for July 2nd
+    {
+      id: 7,
+      title: "Mars Pathfinder Landing",
+      description: "NASA's Mars Pathfinder successfully landed on Mars, deploying the Sojourner rover - the first successful U.S. mission to Mars since the Viking missions of 1976. It provided valuable data about Martian geology and atmosphere.",
+      month: 7,
+      day: 4,
+      year: 1997,
+      category: "Mars Mission",
+      imageUrl: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=800&h=600&fit=crop",
+      references: ["NASA JPL", "Mars Exploration Program"]
     }
   ];
 
   useEffect(() => {
-    // Simulate API call
     setLoading(true);
+    
+    // Filter events based on selected date
+    const selectedMonth = selectedDate.getMonth() + 1; // getMonth() returns 0-11
+    const selectedDay = selectedDate.getDate();
+    
+    const filteredEvents = astronomicalEventsDB.filter(event => 
+      event.month === selectedMonth && event.day === selectedDay
+    );
+    
+    // Simulate API delay
     const timer = setTimeout(() => {
-      // Filter events based on selected date (for demo, we'll show all events)
-      setEvents(mockEvents);
+      setEvents(filteredEvents);
       setLoading(false);
-    }, 1000);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [selectedDate]);
 
   const formatDateForDisplay = (date: Date) => {
     return format(date, "MMMM d, yyyy");
+  };
+
+  const getDateKey = (date: Date) => {
+    return `${date.getMonth() + 1}-${date.getDate()}`;
   };
 
   return (
@@ -145,7 +206,7 @@ const OnThisDaySection = () => {
               </Card>
             ))}
           </div>
-        ) : (
+        ) : events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
               <Card key={event.id} className="bg-slate-800/50 border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 group">
@@ -170,7 +231,7 @@ const OnThisDaySection = () => {
                       {event.title}
                     </CardTitle>
                     <p className="text-sm text-purple-300 mb-2">
-                      {event.date}, {event.year}
+                      {format(new Date(event.year, event.month - 1, event.day), "MMMM d, yyyy")}
                     </p>
                   </div>
                 </CardHeader>
@@ -194,16 +255,14 @@ const OnThisDaySection = () => {
               </Card>
             ))}
           </div>
-        )}
-
-        {!loading && events.length === 0 && (
+        ) : (
           <div className="text-center py-16">
             <div className="mb-4">
               <Telescope className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             </div>
             <h3 className="text-2xl font-bold text-purple-200 mb-2">No Events Found</h3>
             <p className="text-gray-400">
-              No astronomical events recorded for {formatDateForDisplay(selectedDate)}
+              No astronomical events recorded for {formatDateForDisplay(selectedDate)}. Try selecting a different date to discover other cosmic moments in history!
             </p>
           </div>
         )}
