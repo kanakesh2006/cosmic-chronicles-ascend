@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -139,8 +140,11 @@ const OnThisDaySection = () => {
       setError(null);
 
       try {
+        console.log('Loading events for date:', format(selectedDate, 'yyyy-MM-dd'));
+        
         // Always get historical events (no API calls needed)
         const historicalEvents = getHistoricalEvents(selectedDate);
+        console.log('Found historical events:', historicalEvents.length);
         
         // Get NASA APOD data (with caching)
         const cacheKey = getCacheKey(selectedDate);
@@ -163,6 +167,7 @@ const OnThisDaySection = () => {
 
         // Combine both sources
         const allEvents = [...nasaEvents, ...historicalEvents];
+        console.log('Total events loaded:', allEvents.length);
         setEvents(allEvents);
 
       } catch (error) {
@@ -234,10 +239,13 @@ const OnThisDaySection = () => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
+                  onSelect={(date) => {
+                    console.log('Date selected:', date);
+                    if (date) setSelectedDate(date);
+                  }}
                   initialFocus
                   disabled={(date) => date > new Date()}
-                  className={cn("p-3 pointer-events-auto bg-slate-900 text-purple-200")}
+                  className="p-3 pointer-events-auto bg-slate-900 text-purple-200"
                 />
               </PopoverContent>
             </Popover>
