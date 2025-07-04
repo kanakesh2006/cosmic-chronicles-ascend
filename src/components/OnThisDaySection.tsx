@@ -124,6 +124,9 @@ const OnThisDaySection = () => {
       );
 
       if (!response.ok) {
+        console.error(`Supabase API Error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
         throw new Error(`Supabase API Error: ${response.status}`);
       }
 
@@ -215,6 +218,21 @@ const OnThisDaySection = () => {
     if (category === 'launch') return 'bg-purple-600/80 text-purple-100';
     if (category === 'discovery') return 'bg-green-600/80 text-green-100';
     return 'bg-orange-600/80 text-orange-100';
+  };
+
+  const formatEventDate = (dateString: string) => {
+    try {
+      // Handle different date formats
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        // If date is invalid, return the original string
+        return dateString;
+      }
+      return format(date, "MMMM d, yyyy");
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return dateString;
+    }
   };
 
   return (
@@ -335,7 +353,7 @@ const OnThisDaySection = () => {
                       {event.title}
                     </CardTitle>
                     <p className="text-sm text-purple-300 mb-2">
-                      {format(new Date(event.date), "MMMM d, yyyy")}
+                      {formatEventDate(event.date)}
                     </p>
                   </div>
                 </CardHeader>
