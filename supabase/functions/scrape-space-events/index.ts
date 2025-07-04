@@ -36,14 +36,15 @@ const SPACE_KEYWORDS = [
   'NASA', 'astronaut', 'space', 'moon', 'Mars', 'launch', 'ISS', 
   'satellite', 'observatory', 'cosmic', 'Hubble', 'ESA', 'spacecraft',
   'rocket', 'mission', 'orbit', 'planet', 'solar', 'universe', 'galaxy',
-  'Apollo', 'Soyuz', 'SpaceX', 'telescope', 'comet', 'asteroid'
+  'Apollo', 'Soyuz', 'SpaceX', 'telescope', 'comet', 'asteroid', 'eclipse',
+  'supernova', 'lunar', 'stellar', 'interstellar', 'nebula', 'meteor'
 ];
 
 const EVENT_TYPES = {
-  'launch': ['launch', 'launched', 'mission'],
-  'discovery': ['discover', 'found', 'observed', 'detected'],
-  'eclipse': ['eclipse', 'occultation'],
-  'milestone': ['first', 'land', 'orbit', 'dock', 'return']
+  'launch': ['launch', 'launched', 'mission', 'lift off', 'takeoff'],
+  'discovery': ['discover', 'found', 'observed', 'detected', 'spotted'],
+  'eclipse': ['eclipse', 'occultation', 'transit'],
+  'milestone': ['first', 'land', 'orbit', 'dock', 'return', 'achievement']
 };
 
 function determineEventType(text: string): string {
@@ -93,11 +94,15 @@ async function scrapeWikipediaEvents(month: number, day: number): Promise<SpaceE
   const dayStr = day.toString().padStart(2, '0');
   
   try {
+    console.log(`Fetching Wikipedia events for ${monthStr}/${dayStr}...`);
+    
+    // Use the correct Wikipedia REST API endpoint for "On This Day" events
     const response = await fetch(
       `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${monthStr}/${dayStr}`,
       {
         headers: {
-          'User-Agent': 'CosmicChronicles/1.0 (https://example.com/contact)'
+          'User-Agent': 'CosmicChronicles/1.0 (https://example.com/contact)',
+          'Accept': 'application/json'
         }
       }
     );
@@ -107,10 +112,18 @@ async function scrapeWikipediaEvents(month: number, day: number): Promise<SpaceE
       return [];
     }
     
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error(`Expected JSON, got ${contentType} for ${monthStr}/${dayStr}`);
+      return [];
+    }
+    
     const data = await response.json();
     const spaceEvents: SpaceEvent[] = [];
     
-    if (data.events) {
+    if (data.events && Array.isArray(data.events)) {
+      console.log(`Processing ${data.events.length} events for ${monthStr}/${dayStr}`);
+      
       for (const event of data.events) {
         const eventText = event.text || '';
         const eventYear = event.year || new Date().getFullYear();
@@ -145,6 +158,8 @@ async function scrapeWikipediaEvents(month: number, day: number): Promise<SpaceE
           });
         }
       }
+    } else {
+      console.log(`No events array found for ${monthStr}/${dayStr}`);
     }
     
     return spaceEvents;
@@ -174,6 +189,17 @@ serve(async (req) => {
       let totalEvents = 0;
       const errors: string[] = [];
       
+      // Clear existing data to avoid duplicates
+      console.log('Clearing existing space events...');
+      const { error: deleteError } = await supabaseClient
+        .from('space_events')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+      
+      if (deleteError) {
+        console.error('Error clearing existing data:', deleteError);
+      }
+      
       // Loop through all 365 days
       for (let month = 1; month <= 12; month++) {
         const daysInMonth = new Date(2024, month, 0).getDate();
@@ -197,10 +223,12 @@ serve(async (req) => {
                 totalEvents += events.length;
                 console.log(`✅ Inserted ${events.length} events for ${month}/${day}`);
               }
+            } else {
+              console.log(`No space events found for ${month}/${day}`);
             }
             
             // Small delay to be respectful to Wikipedia API
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
             
           } catch (error) {
             console.error(`Error processing ${month}/${day}:`, error);

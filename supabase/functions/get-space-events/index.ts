@@ -23,6 +23,8 @@ serve(async (req) => {
     const year = url.searchParams.get('year');
     const limit = url.searchParams.get('limit') || '10';
 
+    console.log(`Fetching events for date: ${date}, year: ${year}, limit: ${limit}`);
+
     if (!date) {
       return new Response(
         JSON.stringify({ error: 'Date parameter is required (format: MM-DD)' }),
@@ -46,7 +48,7 @@ serve(async (req) => {
       )
     }
 
-    // Build query
+    // Build query using PostgreSQL date functions
     let query = supabaseClient
       .from('space_events')
       .select('*')
@@ -60,12 +62,15 @@ serve(async (req) => {
       query = query.eq('year', parseInt(year));
     }
 
+    console.log('Executing database query...');
     const { data, error } = await query;
 
     if (error) {
       console.error('Database error:', error);
       throw error;
     }
+
+    console.log(`Found ${data?.length || 0} events`);
 
     // Transform the data for frontend consumption
     const events = data?.map(event => ({
@@ -97,11 +102,13 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in get-space-events:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message,
+        events: [],
+        count: 0
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
