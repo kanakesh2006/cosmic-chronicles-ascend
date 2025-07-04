@@ -11,6 +11,7 @@ import Timeline from "./pages/Timeline";
 import StarMap from "./pages/StarMap";
 import Storybook from "./pages/Storybook";
 import Simulator from "./pages/Simulator";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +26,6 @@ const App = () => (
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <main className="flex-1 relative">
-              {/* Global sidebar trigger in header */}
               <header className="absolute top-4 left-4 z-50">
                 <SidebarTrigger className="bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-200" />
               </header>
@@ -36,6 +36,7 @@ const App = () => (
                 <Route path="/starmap" element={<StarMap />} />
                 <Route path="/storybook" element={<Storybook />} />
                 <Route path="/simulator" element={<Simulator />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

@@ -4,23 +4,23 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ExternalLink, Rocket, Telescope, AlertCircle, Star, History } from 'lucide-react';
+import { CalendarIcon, ExternalLink, Rocket, Telescope, AlertCircle, Star, History, Database } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { getEventsByDate, type HistoricalEvent } from '@/data/historicalEvents';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AstronomicalEvent {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  month: number;
-  day: number;
+  details?: string;
+  date: string;
   year: number;
   category: string;
   imageUrl: string;
+  image_urls?: string[];
   references?: string[];
-  url?: string;
-  source: 'nasa' | 'historical';
+  source: 'nasa' | 'wikipedia';
 }
 
 interface NASAApiResponse {
@@ -41,17 +41,14 @@ const OnThisDaySection = () => {
 
   const NASA_API_KEY = 'DvrFnIYNJ0Cj7btTNN2mdpSpKiBENWc0GZSjDxSd';
 
-  // Cache management to reduce API calls
-  const getCacheKey = (date: Date) => {
-    return `nasa-apod-${format(date, 'yyyy-MM-dd')}`;
-  };
+  // Cache management for NASA APOD
+  const getCacheKey = (date: Date) => `nasa-apod-${format(date, 'yyyy-MM-dd')}`;
 
   const getCachedData = (cacheKey: string): AstronomicalEvent[] | null => {
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const parsedData = JSON.parse(cached);
-        // Check if cache is less than 24 hours old
         const cacheTime = new Date(parsedData.timestamp);
         const now = new Date();
         const hoursDiff = (now.getTime() - cacheTime.getTime()) / (1000 * 60 * 60);
@@ -68,10 +65,7 @@ const OnThisDaySection = () => {
 
   const setCachedData = (cacheKey: string, data: AstronomicalEvent[]) => {
     try {
-      const cacheData = {
-        data,
-        timestamp: new Date().toISOString()
-      };
+      const cacheData = { data, timestamp: new Date().toISOString() };
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
     } catch (e) {
       console.log('Cache write error:', e);
@@ -82,7 +76,6 @@ const OnThisDaySection = () => {
     const formattedDate = format(date, 'yyyy-MM-dd');
     
     try {
-      // NASA APOD API for the specific date
       const apodResponse = await fetch(
         `https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}&date=${formattedDate}`
       );
@@ -94,16 +87,16 @@ const OnThisDaySection = () => {
       const apodData: NASAApiResponse = await apodResponse.json();
       
       const event: AstronomicalEvent = {
-        id: Date.now(), // Unique ID for NASA events
+        id: `nasa-${Date.now()}`,
         title: apodData.title,
         description: apodData.explanation,
-        month: date.getMonth() + 1,
-        day: date.getDate(),
+        details: apodData.explanation,
+        date: formattedDate,
         year: date.getFullYear(),
         category: apodData.media_type === 'video' ? 'Space Video' : 'Astronomical Image',
         imageUrl: apodData.media_type === 'image' ? (apodData.hdurl || apodData.url) : 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=600&fit=crop',
+        image_urls: [apodData.media_type === 'image' ? (apodData.hdurl || apodData.url) : ''],
         references: ['NASA Astronomy Picture of the Day'],
-        url: apodData.url,
         source: 'nasa'
       };
 
@@ -114,24 +107,51 @@ const OnThisDaySection = () => {
     }
   };
 
-  const getHistoricalEvents = (date: Date): AstronomicalEvent[] => {
+  const fetchSupabaseEvents = async (date: Date): Promise<AstronomicalEvent[]> => {
     const month = date.getMonth() + 1;
     const day = date.getDate();
+    const dateParam = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
     
-    const historicalEvents = getEventsByDate(month, day);
-    
-    return historicalEvents.map(event => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      month: event.month,
-      day: event.day,
-      year: event.year,
-      category: event.category,
-      imageUrl: event.imageUrl,
-      references: event.references,
-      source: 'historical' as const
-    }));
+    try {
+      console.log('Fetching Supabase events for:', dateParam);
+      
+      const response = await fetch(
+        `${supabase.supabaseUrl}/functions/v1/get-space-events?date=${dateParam}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${supabase.supabaseKey}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Supabase API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Supabase events response:', data);
+      
+      if (data.success && data.events) {
+        return data.events.map((event: any) => ({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          details: event.details,
+          date: event.date,
+          year: event.year,
+          category: event.type || event.category,
+          imageUrl: event.imageUrl || event.image_urls?.[0] || 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=600&fit=crop',
+          image_urls: event.image_urls,
+          references: event.references,
+          source: 'wikipedia' as const
+        }));
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Supabase events fetch error:', error);
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -142,9 +162,9 @@ const OnThisDaySection = () => {
       try {
         console.log('Loading events for date:', format(selectedDate, 'yyyy-MM-dd'));
         
-        // Always get historical events (no API calls needed)
-        const historicalEvents = getHistoricalEvents(selectedDate);
-        console.log('Found historical events:', historicalEvents.length);
+        // Fetch Supabase events
+        const supabaseEvents = await fetchSupabaseEvents(selectedDate);
+        console.log('Supabase events loaded:', supabaseEvents.length);
         
         // Get NASA APOD data (with caching)
         const cacheKey = getCacheKey(selectedDate);
@@ -152,55 +172,49 @@ const OnThisDaySection = () => {
         let nasaEvents: AstronomicalEvent[] = [];
 
         if (cachedNASAData) {
-          console.log('Using cached NASA data for', format(selectedDate, 'yyyy-MM-dd'));
+          console.log('Using cached NASA data');
           nasaEvents = cachedNASAData;
         } else {
           try {
-            console.log('Fetching NASA data for', format(selectedDate, 'yyyy-MM-dd'));
+            console.log('Fetching NASA data');
             nasaEvents = await fetchNASAData(selectedDate);
             setCachedData(cacheKey, nasaEvents);
           } catch (nasaError) {
-            console.error('NASA API failed, using historical events only:', nasaError);
-            // Don't throw error, just continue with historical events
+            console.error('NASA API failed:', nasaError);
           }
         }
 
         // Combine both sources
-        const allEvents = [...nasaEvents, ...historicalEvents];
+        const allEvents = [...supabaseEvents, ...nasaEvents];
         console.log('Total events loaded:', allEvents.length);
         setEvents(allEvents);
 
       } catch (error) {
         console.error('Failed to load events:', error);
-        setError('Failed to load some astronomical data. Showing available events.');
-        // Show historical events even if NASA API fails
-        const historicalEvents = getHistoricalEvents(selectedDate);
-        setEvents(historicalEvents);
+        setError('Failed to load some events data.');
+        setEvents([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Add a small delay to prevent rapid API calls when date changes
     const timer = setTimeout(loadEvents, 300);
     return () => clearTimeout(timer);
   }, [selectedDate]);
 
-  const formatDateForDisplay = (date: Date) => {
-    return format(date, "MMMM d, yyyy");
-  };
+  const formatDateForDisplay = (date: Date) => format(date, "MMMM d, yyyy");
 
   const getEventIcon = (category: string, source: string) => {
     if (source === 'nasa') return <Star className="w-3 h-3 mr-1" />;
-    if (category === 'Space Mission') return <Rocket className="w-3 h-3 mr-1" />;
-    if (category === 'Discovery') return <Telescope className="w-3 h-3 mr-1" />;
+    if (category === 'launch') return <Rocket className="w-3 h-3 mr-1" />;
+    if (category === 'discovery') return <Telescope className="w-3 h-3 mr-1" />;
     return <History className="w-3 h-3 mr-1" />;
   };
 
   const getEventBadgeColor = (source: string, category: string) => {
     if (source === 'nasa') return 'bg-blue-600/80 text-blue-100';
-    if (category === 'Space Mission') return 'bg-purple-600/80 text-purple-100';
-    if (category === 'Discovery') return 'bg-green-600/80 text-green-100';
+    if (category === 'launch') return 'bg-purple-600/80 text-purple-100';
+    if (category === 'discovery') return 'bg-green-600/80 text-green-100';
     return 'bg-orange-600/80 text-orange-100';
   };
 
@@ -217,17 +231,16 @@ const OnThisDaySection = () => {
             Discover historical astronomical events and NASA's featured content for this day
           </p>
           <p className="text-sm text-purple-400 mb-8">
-            Combining historical space events with real-time NASA data
+            Powered by Wikipedia historical data + NASA APOD
           </p>
           
-          {/* Date Picker */}
           <div className="flex justify-center mb-8">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-[280px] justify-start text-left font-normal bg-slate-800/50 border-purple-500/30 text-purple-200 hover:bg-purple-500/10",
+                    "w-[280px] justify-start text-left font-normal bg-slate-800/50 border-purple-500/30 text-purple-200 hover:bg-purple-500/10 pointer-events-auto",
                     !selectedDate && "text-muted-foreground"
                   )}
                 >
@@ -235,7 +248,7 @@ const OnThisDaySection = () => {
                   {selectedDate ? formatDateForDisplay(selectedDate) : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-slate-900 border-purple-500/30" align="start">
+              <PopoverContent className="w-auto p-0 bg-slate-900 border-purple-500/30 pointer-events-auto" align="start">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -251,11 +264,10 @@ const OnThisDaySection = () => {
             </Popover>
           </div>
 
-          {/* Data Sources Notice */}
           <div className="mb-8 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg max-w-2xl mx-auto">
             <div className="flex items-center gap-2 text-blue-300 text-sm">
-              <AlertCircle className="w-4 h-4" />
-              <span>Historical events database + NASA APOD (cached to preserve API limits)</span>
+              <Database className="w-4 h-4" />
+              <span>Wikipedia historical events + NASA APOD (cached to preserve API limits)</span>
             </div>
           </div>
         </div>
@@ -282,9 +294,7 @@ const OnThisDaySection = () => {
           </div>
         ) : error ? (
           <div className="text-center py-8 mb-8">
-            <div className="mb-4">
-              <AlertCircle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            </div>
+            <AlertCircle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-yellow-300 mb-2">Partial Data Available</h3>
             <p className="text-gray-400 mb-4">{error}</p>
           </div>
@@ -315,23 +325,18 @@ const OnThisDaySection = () => {
                         {event.source === 'nasa' ? 'NASA Featured' : event.category}
                       </span>
                     </div>
-                    {event.source === 'historical' && (
-                      <div className="absolute top-4 left-4">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-700/80 text-slate-200">
-                          {event.year}
-                        </span>
-                      </div>
-                    )}
+                    <div className="absolute top-4 left-4">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-700/80 text-slate-200">
+                        {event.year}
+                      </span>
+                    </div>
                   </div>
                   <div className="p-6">
                     <CardTitle className="text-xl font-bold text-purple-200 mb-2">
                       {event.title}
                     </CardTitle>
                     <p className="text-sm text-purple-300 mb-2">
-                      {event.source === 'historical' 
-                        ? `${format(new Date(event.year, event.month - 1, event.day), "MMMM d, yyyy")}`
-                        : formatDateForDisplay(selectedDate)
-                      }
+                      {format(new Date(event.date), "MMMM d, yyyy")}
                     </p>
                   </div>
                 </CardHeader>
@@ -340,26 +345,26 @@ const OnThisDaySection = () => {
                     {event.description}
                   </p>
                   
-                  {event.references && (
+                  {event.references && event.references.length > 0 && (
                     <div className="space-y-2 mb-4">
                       <p className="text-xs text-purple-400 font-medium">Sources:</p>
                       {event.references.map((ref, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <ExternalLink className="w-3 h-3 text-purple-400" />
-                          <span className="text-xs text-gray-400">{ref}</span>
+                          <span className="text-xs text-gray-400 truncate">{ref}</span>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {event.url && (
+                  {event.references?.[0] && (
                     <Button 
                       asChild 
                       size="sm" 
                       className="w-full bg-purple-600 hover:bg-purple-700"
                     >
-                      <a href={event.url} target="_blank" rel="noopener noreferrer">
-                        View Full Content <ExternalLink className="w-3 h-3 ml-1" />
+                      <a href={event.references[0]} target="_blank" rel="noopener noreferrer">
+                        Learn More <ExternalLink className="w-3 h-3 ml-1" />
                       </a>
                     </Button>
                   )}
@@ -369,12 +374,10 @@ const OnThisDaySection = () => {
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="mb-4">
-              <Telescope className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-            </div>
+            <Telescope className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-purple-200 mb-2">No Events Found</h3>
             <p className="text-gray-400">
-              No astronomical events found for {formatDateForDisplay(selectedDate)}.
+              No space events found for {formatDateForDisplay(selectedDate)}.
             </p>
           </div>
         )}
