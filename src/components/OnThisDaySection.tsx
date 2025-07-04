@@ -7,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, ExternalLink, Rocket, Telescope, AlertCircle, Star, History, Database } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
 
 interface AstronomicalEvent {
   id: string;
@@ -116,10 +115,10 @@ const OnThisDaySection = () => {
       console.log('Fetching Supabase events for:', dateParam);
       
       const response = await fetch(
-        `${supabase.supabaseUrl}/functions/v1/get-space-events?date=${dateParam}`,
+        `https://nrsjgfqmslqdjwxaulyl.supabase.co/functions/v1/get-space-events?date=${dateParam}`,
         {
           headers: {
-            'Authorization': `Bearer ${supabase.supabaseKey}`,
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yc2pnZnFtc2xxZGp3eGF1bHlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NDk3MTMsImV4cCI6MjA2NzIyNTcxM30.xJvn3JiWwOl-xNuQYEfISU0fvGl0DiS3BT1TTchfH2E`,
           },
         }
       );
