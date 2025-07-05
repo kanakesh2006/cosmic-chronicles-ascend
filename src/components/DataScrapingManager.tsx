@@ -22,9 +22,9 @@ const DataScrapingManager = () => {
 
   const checkStatus = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-space-events?action=status`, {
+      const response = await fetch(`https://nrsjgfqmslqdjwxaulyl.supabase.co/functions/v1/get-space-events?action=status`, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yc2pnZnFtc2xxZGp3eGF1bHlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NDk3MTMsImV4cCI6MjA2NzIyNTcxM30.xJvn3JiWwOl-xNuQYEfISU0fvGl0DiS3BT1TTchfH2E`,
         },
       });
 
@@ -59,10 +59,10 @@ const DataScrapingManager = () => {
         description: "This will take several minutes to complete...",
       });
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-space-events?action=scrape`, {
+      // Use the new proxy function - no auth headers needed!
+      const response = await fetch(`https://nrsjgfqmslqdjwxaulyl.supabase.co/functions/v1/trigger-scrape?action=scrape`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
       });
