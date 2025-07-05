@@ -42,7 +42,6 @@
   - Tailwind CSS for styling
   - ShadCN UI Components
   - GSAP / Framer Motion for animations
-  - D3.js / Three.js for visualizations
 
 - **Backend**:
   - Supabase (PostgreSQL, Edge Functions)
@@ -54,7 +53,6 @@
   - SIMBAD & JPL Horizons (for future integration)
 
 - **Deployment**:
-  - CI/CD optimized for global performance
   - Fast-loading frontend with responsive static asset management
 
 ---
