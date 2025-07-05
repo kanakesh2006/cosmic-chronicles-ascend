@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# 🌠 Cosmic Chronicles — On This Day in Space
 
-## Project info
+**Cosmic Chronicles** is a dynamic, immersive web platform that brings astronomy to life by surfacing real historical space events that happened on the same calendar date in past years. It blends educational value with interactive design, making cosmic history fun, engaging, and personal.
 
-**URL**: https://lovable.dev/projects/827596eb-ce69-4913-9879-b778fbbbec9a
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- 🗓️ **"On This Day in Space" Feed**  
+  Automatically shows real astronomical events tied to the current date, updated daily.
 
-**Use Lovable**
+- 🌀 **Interactive Galactic Timeline**  
+  A scrollable, spiral-based cosmic timeline with animated nodes that display historic events and related media.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/827596eb-ce69-4913-9879-b778fbbbec9a) and start prompting.
+- 🌌 **Augmented Star Map**  
+  Real-time, date-specific constellations, planetary alignments, and celestial overlays, all interactive and zoomable.
 
-Changes made via Lovable will be committed automatically to this repo.
+- 📘 **Animated Storybook Mode**  
+  Each event is rendered as a digital page with animations, draggable elements, tooltips, and audio narrations.
 
-**Use your preferred IDE**
+- 🌠 **Cosmic Event Simulator**  
+  Users can simulate historic solar eclipses, meteor showers, or planetary motions with adjustable viewing controls.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 🖼️ **NASA Image Integration**  
+  Events come with high-resolution images dynamically pulled from NASA’s public APIs.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- 🔍 **Date Picker with Calendar**  
+  Explore space history on any chosen day of the year — birthdays, holidays, or anniversaries.
 
-Follow these steps:
+- 📱 **Mobile-First & Responsive UI**  
+  All features work seamlessly on phones, tablets, and desktops with smooth transitions and optimized layouts.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- ✨ **Cosmic UI Design**  
+  Deep space gradients, glowing effects, and futuristic fonts build a cohesive space-themed experience.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🧰 Tech Stack
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **Frontend**:
+  - React.js (with TypeScript)
+  - Tailwind CSS for styling
+  - ShadCN UI Components
+  - GSAP / Framer Motion for animations
+  - D3.js / Three.js for visualizations
 
-**Edit a file directly in GitHub**
+- **Backend**:
+  - Supabase (PostgreSQL, Edge Functions)
+  - Custom API scraping logic using Wikipedia and NASA APIs
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Data Sources**:
+  - Wikipedia “On This Day” events
+  - NASA Image API
+  - SIMBAD & JPL Horizons (for future integration)
 
-**Use GitHub Codespaces**
+- **Deployment**:
+  - CI/CD optimized for global performance
+  - Fast-loading frontend with responsive static asset management
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🌟 What Makes It Unique?
 
-This project is built with:
+-  Turns every day into a **personal cosmic discovery** — see what happened in the universe on your birthday or any date.
+-  Uses storytelling and simulation to make complex astronomy feel intuitive and inspiring.
+-  AI-powered filters extract **only space-related events** from broad data sources like Wikipedia.
+-  Combines data with **visual media** from NASA to create a multimedia cosmic timeline.
+-  Great for learners, teachers, space enthusiasts, and curious minds of all ages.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 📈 Future Enhancements
 
-Simply open [Lovable](https://lovable.dev/projects/827596eb-ce69-4913-9879-b778fbbbec9a) and click on Share -> Publish.
+- User login and space-event bookmarking  
+- Shareable event cards (digital postcards)  
+- Space trivia quizzes and gamified learning  
+- Voice narration with educational explainers  
+- AR view for constellations on supported devices  
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
